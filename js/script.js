@@ -446,10 +446,9 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
             }            
         })
         .success(function( result ) {
-            let obj = JSON.parse(result);
           //  console.log( `: ${obj}`); 
 
-        if(obj != "" ) {    
+        if(result != "" ) {    
             let obj = JSON.parse(result);
             let size = obj.length;
            // console.log(size);
