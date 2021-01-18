@@ -446,10 +446,10 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
             }            
         })
         .success(function( result ) {
-            let obj = JSON.parse(result);
+          
           //  console.log( `: ${obj}`); 
 
-        if(obj != "" ) {    
+        if(result != "" ) {    
             let obj = JSON.parse(result);
             let size = obj.length;
            // console.log(size);
@@ -650,7 +650,6 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
 /** Inicializa el tema 1 */
 formIni();  
 get_themes_home();
-
 
  
 
