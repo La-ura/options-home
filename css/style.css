@@ -121,3 +121,21 @@
      border: 1px solid #7C7C7C;
 
       }
+
+      #ophome-tabs{
+          width: 95%;
+          margin-top :30px;
+          padding-bottom :50px;
+      }
+      .lbs_transmision{
+          float: left;
+          width: 100px;
+          padding :10px;
+
+      } 
+      #inp_title_transmision{
+          clear: left;
+
+    } 
+
+  

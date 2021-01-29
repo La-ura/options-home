@@ -22,9 +22,14 @@ add_action('wp_ajax_get_themes','get_all_themes');
 add_action('wp_ajax_delete_theme','delete');
 /* Cambia el orden de los temas */
 add_action('wp_ajax_change_order','chenge_order_themes');
-
-
+/* Guardar transmision en vivo */
+add_action('wp_ajax_save_trans_vivo','save_transmision_vivo');
+/* Obtiene transmision en vivo */
+add_action('wp_ajax_get_trans_vivo','get_transmision_vivo');
 add_action('wp_ajax_save_main_theme_home','save_main_theme');
+add_action('wp_ajax_save_update_edit','save_edit');
+add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
+
 
 	/* Add options page	 */
 	function add_plugin_page(){
@@ -38,29 +43,81 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 		);
 	}
 
-	function nombre_de_la_funcion(){
-	
-		// Nuestro código de manipulación de los datos
-		
-	}
-
 	function create_admin_page(){
 		add_action('admin_post_accion', 'nombre_de_la_funcion'); // Para usuarios logueados
 		
 		?>
+<div class="wrap">
+<div id="ophome-tabs">
+  <ul>
+    <li><a href="#tabs-1">Temas del home</a></li>
+    <li id="link_tab_2"><a href="#tabs-2">Transmisi&oacute;n en vivo</a></li>
+    <li id="link_tab_3"><a href="#tabs-3">Selecci&oacute;n del editor</a></li>
+  </ul>
+  <div id="tabs-1"></div>
+  <div id="tabs-2">
+
+  <h1>Transmisi&oacute;n en vivo</h1>
+		<form method="post">
 	
-	<div class="wrap">
-	
-		</div><!-- wrap -->
-		<div  class="bt_save_them">
-		<input type ="button" class ="button tagadd" value="Añadir tema" id="add_theme">	</div>
+	<div class ="opch_txt_block">
+		<div class = "opch_txt_left">T&iacute;tulo : </div>
+		<div> <input  type="text"   id="title_trans_vivo" size = "70" placeholder=" T&iacute;tulo transmisi&oacute;n en vivo" /></div>
+	</div>
+	<div class ="opch_txt_block">
+	<div class = "opch_txt_left">Imagen : </div>
+			<input id="image-url" size = "55" type="text" name="image" placeholder="Selecciona una imagen" />
+			<input id="upload-button" type="button" class="button" value="Upload Image" />
+	</div>
+	<div class = "opch_txt_block">
+	<div class = "opch_txt_left"> Activar : </div>	<input type="checkbox" id ="active_transmision">  &nbsp;
+	</div>
+		 
+	<div class ="opch_save"> 
+		  <input class ="button button-primary button-large" id = "save_transmision_vivo" type="button" value="Guardar" />
+	</div>
+	</form>
+  </div>
 
-		<div class="bt_orden_them">
-		<input type ="button" class ="button tagadd" value="Guardar orden de los temas" id="change_order_theme">	
-		</div>
+  <div id="tabs-3">
+	  <h1>Selecci&oacute;n del editor</h1>
+	  <div class ="opch_txt_block">
+	  <div class = "opch_txt_left"> Resumen : </div>
+	  <div> <textarea name="textarea" id="summary_edit" rows="10" cols="69"  placeholder="Escribe el resumen aqu&iacute;"></textarea></div>
 
-		
+	 </div>
+	  <div class ="opch_txt_block">
+            <div class = "opch_txt_left">Nota 1 : </div>
+            <div>
+                <input type = "text" name = "note_edit_update" size = "70" id = "name_note_edit_0" placeholder="Buscar nota 1">
+                <input type ="hidden" id ="id_note_edit_0" >
+            </div>
+            <div class="resultado_temas_cont" id="res_note_edit_0"></div>
+	</div>
 
+	<div class ="opch_txt_block">
+            <div class = "opch_txt_left">Nota 2 : </div>
+            <div>
+                <input type = "text" name = "note_edit_update" size = "70" id = "name_note_edit_1" placeholder="Buscar nota 2">
+                <input type ="hidden" id ="id_note_edit_1" >
+            </div>
+            <div class="resultado_temas_cont" id="res_note_edit_1"></div>
+	</div>
+
+	<div class ="opch_txt_block">
+            <div class = "opch_txt_left">Nota 3 : </div>
+            <div>
+                <input type = "text" name = "note_edit_update" size = "70" id = "name_note_edit_2" placeholder="Buscar nota 3">
+                <input type ="hidden" id ="id_note_edit_2" >
+            </div>
+            <div class="resultado_temas_cont" id="res_note_edit_2"></div>
+	</div>
+		 
+	<div class ="opch_save"> 
+		  <input class ="button button-primary button-large" id ="save_update_edit" type="button" value="Guardar" />
+	</div>
+  </div>
+</div>
 		<?php
 	}
 
@@ -74,6 +131,8 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 									'jquery-effects-core', 
 									'jquery-core' ,
 									'jquery-ui-selectable'), '1', true );
+		wp_enqueue_script("jquery-ui-tabs");
+								
 
 		wp_enqueue_script('opc_home');
 	  	wp_localize_script('opc_home','opc_vars',
@@ -82,9 +141,8 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 	  	wp_register_style('opc_style',   plugin_dir_url( __FILE__ ) . 'css/style.css' );
 		wp_enqueue_style('opc_style');    
 		 
-	//	wp_register_style('opc_style_2','https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css');
-	//	wp_enqueue_style('opc_style_2'); 
-		 
+		wp_register_style('opc_style_2',plugin_dir_url( __FILE__ ) . 'css/base-jquery-ui.css');
+		wp_enqueue_style('opc_style_2'); 
 		 
 		}
 
@@ -120,8 +178,7 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 	function get_posts_by_tema(){
 		global  $wpdb;
 		$arr = array();
-		//$str = $_POST["search"];
-		//$title_post =  $_POST["title"];
+		
 		$filter =[];
 		
 		if( isset ($_POST["search"]) && $_POST["search"] != 0) 
@@ -134,7 +191,7 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 		
 		
 		if($fil_total  == 2) {
-			$qry_where  = " WHERE ".$filter[0]. " AND ".$filter[1]. " AND post_status ='publish'";
+			$qry_where  = " WHERE ".$filter[0]. " AND ".$filter[1]. " AND post_status ='publish' ";
 
 			$qry = "SELECT t.term_id, name , term_taxonomy_id , ID, post_title , post_name
 				FROM wp_terms t 
@@ -145,7 +202,7 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 				 
 		}
 		else if($fil_total  == 1){
-			$qry_where  = " WHERE ".$filter[0] . " AND post_status ='publish'";
+			$qry_where  = " WHERE ".$filter[0] . " AND post_status ='publish' ";
 
 			$qry = "SELECT t.term_id, name , term_taxonomy_id , ID, post_title , post_name
 				FROM wp_terms t 
@@ -156,15 +213,13 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 		}
 		else if($fil_total  == 0){
 			$qry ="SELECT  ID, post_title , post_name FROM  wp_posts  
-			WHERE post_status ='publish' ORDER BY post_modified DESC  LIMIT 0, 70 ;";
-		
+			WHERE post_status ='publish' AND post_type = 'post' ORDER BY post_modified DESC  LIMIT 0, 70 ;";
 		}
-
-		//echo ($qry );
-		
+			
 			$posts = $wpdb->get_results( $qry );
-		
+	
 		$n=0;
+		
 		foreach( $posts as $row ) {
 			$id = $row->ID;
 			$post_title = $row->post_name;
@@ -175,52 +230,19 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 	 	$json = json_encode ($arr);
 		echo $json;
 		wp_die();
-	//	echo $arr;
-
 	
-	 	
 	}
 
 	function save_theme(){
 		$opc = $_POST["tema"];
 		$val = $_POST["datos"];
-		
-		
 		update_option($opc , $val  , "no" );
-		
 		wp_die();
 	}
-/*
-	function get_all_themes_2(){
-		global  $wpdb;
-		$arr2 = array();
 
-		$qry = "SELECT option_id, option_name, option_value 
-				FROM wp_options 
-				WHERE option_name LIKE  '%home_theme_%' ORDER BY option_name ASC";
-		$themes = $wpdb->get_results( $qry );
-
-		$n=0;
-		foreach( $themes as $row ) { 
-			$value = unserialize ($row->option_value);
-			$arr = array();
-			$arr["option_id"]=$row->option_id;
-			$arr["option_name"] =$row->option_name;
-			$arr["value"]=$value ;
-
-			array_push($arr2, $arr);
-			$n++;
-		}
-		$json = json_encode ($arr2 );
-		echo $json;
-	 	 wp_die();
-
-	}
-*/
 	function get_all_themes(){
 		global  $wpdb;
 		$arr2 = array();
-
 		$qry = "SELECT option_id, option_name, option_value 
 				FROM wp_options 
 				WHERE option_name = 'main_home_theme'";
@@ -229,7 +251,6 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 		if(count($themes)>0){
 			foreach( $themes as $row ) { 
 				$value = unserialize ($row->option_value);
-			//	var_dump($value);
 				$total_themes = count($value);
 				
 				for($i=0 ; $i<$total_themes ; $i++){
@@ -250,16 +271,12 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 							$arr["value"]=$valor2;
 							array_push($arr2, $arr);
 						}
-
 				}
-				
-				
 			}
-			$json = json_encode ($arr2 );
-			
+			$json = json_encode ($arr2 );	
 		}
 		echo $json;
-	 	 wp_die();
+	 	wp_die();
 
 	}
 
@@ -277,10 +294,8 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 			$orden[$clave] = $fila['order'];
 			$option_name[$clave] = $fila['option_name'];
 		}
-
 		array_multisort($orden, SORT_ASC, $datos);
 		print_r($datos);
-
 		update_option("main_home_theme",$datos  , "no" );
 		wp_die();
 
@@ -292,6 +307,45 @@ add_action('wp_ajax_save_main_theme_home','save_main_theme');
 		echo $update ;
 		wp_die();
 
+	}
+
+	function save_transmision_vivo(){
+		$datos = $_POST["datos"];
+		$update =update_option("home_live_broadcast",$datos  , "no" );
+		echo $update ;
+		wp_die();
+	}
+	
+	function get_transmision_vivo(){
+		global  $wpdb;
+		$sql ="SELECT option_value FROM wp_options WHERE option_name = 'home_live_broadcast'";
+		$res = $wpdb->get_results($sql);
+
+		if(count($res)>0){
+			$value = unserialize($res[0]->option_value);
+			$json = json_encode($value );
+			echo $json;
+		}else {
+			echo '';
+		}
+		wp_die();
+	}
+
+	function save_edit(){
+		$datos = $_POST["datos"];
+		$update =update_option("home_editorial_update",$datos  , "no" );
+		echo $update ;
+		wp_die();
+		
+	}
+
+	function get_feed_editorial_update(){
+		$res =  get_option( "home_editorial_update" );
+		if($res !== false){
+			$json =  json_encode($res);
+			echo $json ;
+		}else echo "";
+		wp_die();
 	}
 
 

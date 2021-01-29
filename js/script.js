@@ -1,8 +1,8 @@
 var jq2 = jQuery.noConflict();
 jq2(function( $ ) {
    var n = 1;
+   var activeTab =0;
      function form_default (ext =""){
-       
 let fm = `<div class ="opch_wrap" id="theme_content_${n}">
        
         <div class ="opch_txt_block">
@@ -95,26 +95,26 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
    
     }
 
-    function formIni (){
-        jq2("div.wrap").html("<h1>Opciones del Home</h1>");
-    }
+  
 
     /* Agrega nuevo tema vacio */
     jq2(document).on("click","#add_theme",function(e){
        
-        if(n<6){
+        if(n<7){
+            jq2("#bt_save_them_1").remove();
+            jq2("#bt_orden_them_1").remove();
             let fmdefault = form_default();
-            jq2("div.wrap").append(fmdefault);
+            jq2("div#tabs-1").append(fmdefault);
             nametema();
         }else {
             return false;
         }
-        
+        btn_generales_tab1();
     });
-
+    /* Genera un nombre al tema para option name = 'home_theme_#' */
     let nametema = () => {
         let allNames = [];
-        for(let j=0; j<5; j++){
+        for(let j=0; j<7; j++){
             allNames.push(j+1);
         }
         let id = "";
@@ -129,11 +129,11 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                     id = jq2(this).attr("id");
                 }
         });
-        //console.log("qqqq" +id );
         let name_opc =  allNames[0];
         jq2(`#${id}`).val(`home_theme_${name_opc}`);
     }
 
+    /* obiene los temas  taxonomy ='TEMA' */
     function get_topic(m){
         jq2("#resultado_temas_"+m).html("");
         let valor1 = jq2("#tema_"+m).val();
@@ -146,7 +146,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
             }            
         })
         .success(function( result ) {
-           // console.log(result);
+           
           let obj = JSON.parse(result);
             let size = obj.length;
             let idSelectable = "selectable"+m;
@@ -175,11 +175,12 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
          });
     }
 
+
+    /* keyup los temas */
    jq2(document).on("keyup",  "input[name='tema']" ,function(e){
     let item = jq2(this).attr('id');
     let k = item.substr(5);
-    let minlength =3;
-    //console.log("onkeyup");
+    let minlength =1;
     let that = this, value = jq2(this).val();
     if(value.length >= minlength ) {
         get_topic(k);
@@ -187,15 +188,14 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
     }
      });
 
-
+     /* Obtiene los post post_type = 'post' */
     function get_posts(m){
        jq2("#res_nmn_"+m).html("");
         let tema_id = jq2("#tema_id_"+m).val();
         if(tema_id =="") tema_id=0;
         let search_title = jq2("#nmn_"+m).val();
         if(search_title =="") search_title=0;
-        let $f = $(this);
-     //  if(tema_id != ""){ console.log(tema_id); } 
+
         jq2.ajax({
             url: opc_vars.ajaxurl,
             type: "POST",
@@ -206,10 +206,8 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
             },
             beforeSend: function(){   
                 jq2("#res_nmn_"+m).html('<div class="imgload">Buscando resultados ...</div>');
-            
             },           
-            success : function( result ) {
-                // console.log(result);
+            success : function( result ) {   
                     let obj = JSON.parse(result);
                     let size = obj.length;
                     let idSelectable = "selectable_mn"+m;   
@@ -231,7 +229,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                            jq2("#res_nmn_"+m).html("");
                         }
                     });
-                  
+                 
                 },
                 fail: function( jqXHR, textStatus, errorThrown ) {
                     console.log( "La solicitud de nota principal ha fallado: " +  textStatus +" - "  +errorThrown);
@@ -287,14 +285,12 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
     }
      });
 
-
     jq2(document).on("focus",  "input[name='name_notes']" ,function(e){
         let item = jq2(this).attr('id');
        // console.log("este es el id" +  item);
         let tema = item.substr(5);
         let elem = item.substr(3 , 1) ;
         let that = this, value = jq2(this).val();
-       
             get_notes(tema, elem);
             return false;
         
@@ -326,10 +322,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                 search : tema_id
             },
             beforeSend: function(){
-               
                 jq2(`#${res_notas}`).html('<div class="imgload">Buscando resultados ...</div>');
-             
-
             },    
             success : function( result ) {
                 // console.log(result);
@@ -364,7 +357,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
         })     
     }
 
-    jq2(document).on("click",  ".button.button-large " ,function(e){
+    jq2(document).on("click",  "input[name='btn_save_themes']" ,function(e){
         let item = jq2(this).attr('id');
         let tema = item.substr(11);
         save_themes(tema);  
@@ -437,79 +430,86 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
     }
 
     
-    function get_themes_home(){
-        jq2.ajax({
+    async function get_themes_home(){
+        jq2("div#tabs-1").html("<h1>Temas del Home</h1>");
+
+       await  jq2.ajax({
             url: opc_vars.ajaxurl,
             type: "POST",
             data: {
                 action : 'get_themes'
-            }            
-        })
-        .success(function( result ) {
+            } ,
+            success : function( result ) {
           
-          //  console.log( `: ${obj}`); 
-
-        if(result != "" ) {    
-            let obj = JSON.parse(result);
-            let size = obj.length;
-           // console.log(size);
-        if(size > 0) {
-            for(let i = 0; i< size ; i++){
-                let k = i+1;
-
-                let fmdefault = form_default(k);
-                jq2("div.wrap").append(fmdefault);
-
-                let option_name = obj[i]["option_name"];
-                let order = k;   
-                let name  = obj[i]["value"]["name"];
-                let mainnoteid  = obj[i]["value"]["main_note_id"];
-                let mainnotename  = obj[i]["value"]["main_note_name"];
-                let taxonomyid  = obj[i]["value"]["taxonomy_id"];
-                let taxonomyname = obj[i]["value"]["taxonomy_name"];
-                let arry_notes = obj[i]["value"]["notes"];
-                
-                jq2(`#theme_name_${k}`).val(name);
-                jq2(`#imn_${k}`).val(mainnoteid);
-                jq2(`#nmn_${k}`).val(mainnotename);
-                jq2(`#tema_id_${k}`).val(taxonomyid);
-                jq2(`#tema_${k}`).val(taxonomyname);
-                jq2(`#option_name_${k}`).val(option_name);
-                jq2(`#order_${k}`).val(order);
-
-                //console.log( `${name} : main_note ${mainnoteid} : taxonomyid  ${taxonomyid} :  taxonomyname ${taxonomyname}`);
-                if( arry_notes !== undefined){
-                    let tn = arry_notes.length;
-                    let a = 1;
-                    for(let m = 0 ; m<tn ; m++ ){
-                        
-                    let noteid =     arry_notes[m]["note_id"];
-                    let notename =     arry_notes[m]["note_name"];
-                    let active =    JSON.parse(arry_notes[m]["active"]);
-                    let thumbnail = JSON.parse( arry_notes[m]["thumbnail"]);
-
-                    jq2(`#in_${a}_${k}`).val(noteid);
-                    jq2(`#nn_${a}_${k}`).val(notename);
-
-                    jq2(`#ckact_${a}_${k}`).prop('checked', active );
-                    jq2(`#thum_${a}_${k}`).prop('checked', thumbnail);
-                    
-                    a++;
-                    } 
-                }
-            } 
-        }
-    }else{
-        console.log("No hay themas guardados");
-        let fmdefault = form_default();
-        jq2("div.wrap").append(fmdefault);
-        nametema();
-    }
-        })
-        .fail(function( jqXHR, textStatus, errorThrown ) {
-             console.log( "La solicitud de obtener get_themes_home ha fallado: " +  textStatus +" - "  +errorThrown);
-         });
+                //  console.log( `: ${obj}`); 
+      
+              if(result != "" ) {    
+                  let obj = JSON.parse(result);
+                  let size = obj.length;
+                 // console.log(size);
+              if(size > 0) {
+                  for(let i = 0; i< size ; i++){
+                      let k = i+1;
+      
+                      let fmdefault = form_default(k);
+                      jq2("div#tabs-1").append(fmdefault);
+      
+                      let option_name = obj[i]["option_name"];
+                      let order = k;   
+                      let name  = obj[i]["value"]["name"];
+                      let mainnoteid  = obj[i]["value"]["main_note_id"];
+                      let mainnotename  = obj[i]["value"]["main_note_name"];
+                      let taxonomyid  = obj[i]["value"]["taxonomy_id"];
+                      let taxonomyname = obj[i]["value"]["taxonomy_name"];
+                      let arry_notes = obj[i]["value"]["notes"];
+                      
+                      jq2(`#theme_name_${k}`).val(name);
+                      jq2(`#imn_${k}`).val(mainnoteid);
+                      jq2(`#nmn_${k}`).val(mainnotename);
+                      jq2(`#tema_id_${k}`).val(taxonomyid);
+                      jq2(`#tema_${k}`).val(taxonomyname);
+                      jq2(`#option_name_${k}`).val(option_name);
+                      jq2(`#order_${k}`).val(order);
+      
+                      //console.log( `${name} : main_note ${mainnoteid} : taxonomyid  ${taxonomyid} :  taxonomyname ${taxonomyname}`);
+                      if( arry_notes !== undefined){
+                          let tn = arry_notes.length;
+                          let a = 1;
+                          for(let m = 0 ; m<tn ; m++ ){
+                              
+                          let noteid =     arry_notes[m]["note_id"];
+                          let notename =     arry_notes[m]["note_name"];
+                          let active =    JSON.parse(arry_notes[m]["active"]);
+                          let thumbnail = JSON.parse( arry_notes[m]["thumbnail"]);
+      
+                          jq2(`#in_${a}_${k}`).val(noteid);
+                          jq2(`#nn_${a}_${k}`).val(notename);
+      
+                          jq2(`#ckact_${a}_${k}`).prop('checked', active );
+                          jq2(`#thum_${a}_${k}`).prop('checked', thumbnail);
+                          
+                          a++;
+                          } 
+                      }
+                     // console.log(` ........... ${k} ........  `);
+                  } 
+              }
         
+              }else{
+                  console.log("No hay themas guardados");
+                  let fmdefault = form_default();
+                  jq2("div#tabs-1").append(fmdefault);
+                  nametema();
+              }
+              },
+              fail : function( jqXHR, textStatus, errorThrown ) {
+                   console.log( "La solicitud de obtener get_themes_home ha fallado: " +  textStatus +" - "  +errorThrown);
+               }
+                         
+            
+        });
+        await btn_generales_tab1();
+     
     }
 
 jq2(document).on("click","input[name=btn_delete_themes]",function(e){
@@ -646,12 +646,259 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
 
     }
 
+    function btn_generales_tab1(){
+        
+        let btn_gral  =` <div  class="bt_save_them" id ="bt_save_them_1"> <input type ="button" class ="button tagadd" value="Añadir tema" id="add_theme"></div>
+                <div class="bt_orden_them" id ="bt_orden_them_1">	<input type ="button" class ="button tagadd" value="Guardar orden de los temas" id="change_order_theme"></div>`;     
+             jq2("div#tabs-1").append(btn_gral);
+           //  console.log(" .. botones generales ..");
 
-/** Inicializa el tema 1 */
-formIni();  
-get_themes_home();
-
+    }
  
+    let mediaUploader;
+    jq2('#upload-button').click(function(e) {
+       
+		e.preventDefault();
+
+	  // If the uploader object has already been created, reopen the dialog
+		if (mediaUploader) {
+			mediaUploader.open();
+			return;
+		}
+
+	  // Extend the wp.media object
+	  mediaUploader = wp.media.frames.file_frame = wp.media({
+				title: 'Selecciona una imagen',
+				button: {
+				text: 'Selecciona una imagen'
+			}, multiple: false });
+
+	  // When a file is selected, grab the URL and set it as the text field's value
+	  mediaUploader.on('select', function() {
+			attachment = mediaUploader.state().get('selection').first().toJSON();
+			$('#image-url').val(attachment.url);
+		});
+
+	  // Open the uploader dialog
+	  mediaUploader.open();
+	});
+
+    jq2("#save_transmision_vivo").click(function (){
+        let transmision = new Object();
+        let title_trans   = jq2("#title_trans_vivo").val();
+        let imagen_trans = jq2("#image-url").val();
+        let active_trans = jq2('#active_transmision').is(':checked');
+
+       transmision.title =  title_trans;
+       transmision.image =  imagen_trans;
+       transmision.active = active_trans;
+
+       console.log( active_trans);
+        jq2.ajax({
+            url: opc_vars.ajaxurl,
+            type : "POST",
+            data : {
+                action : 'save_trans_vivo',
+                datos :transmision
+                
+            },
+            success : function (res){
+                //console.log(res );
+                location.reload();
+            }
+        })
+    });
+
+    function get_feed_trasmision_vivo(){
+       
+        jq2.ajax({
+            url: opc_vars.ajaxurl,
+            type : "POST",
+            data : {
+                action : 'get_trans_vivo',
+                
+            },
+            success : function (res){
+                //console.log(res);
+                if(res != ""){
+                    let obj = JSON.parse(res);
+                    jq2("#title_trans_vivo").val(obj["title"]);
+                    jq2("#image-url").val(obj["image"]);
+                    jq2("#active_transmision").prop('checked', JSON.parse(obj["active"]));
+                    
+                   // console.log( );
+
+                }
+            }
+        })
+    }
+
+    function get_feed_update_edit(){
+        
+        jq2.ajax({
+            url: opc_vars.ajaxurl,
+            type : "POST",
+            data : {
+                action : 'get_update_edit'
+            },
+            success : function(res){
+                
+                if(res != ""){
+                    let obj = JSON.parse(res);
+                    jq2("#summary_edit").val(obj["summary"]);
+                 
+                        if(obj.notes  !== undefined){
+                          
+                         let nota = obj.notes;
+                          let tl =   Object.keys(nota).length;
+                           for (let i = 0; i< tl; i++){
+                               let name = nota[i]["note_name"];
+                               let id = nota[i]["note_id"];
+                            jq2(`#name_note_edit_${i}`).val(name);
+                            jq2(`#id_note_edit_${i}`).val(id);
+
+                           }
+                       
+                        }
+                   
+                 }
+            }
+        })
+    }
+
+
+
+
+  jq2("#save_update_edit").click(function (){
+     
+    let updateEditorial = new Object();
+    let summary = jq2("#summary_edit").val();
+    let arrayNotes = [];
+   
+    jq2(`input[name='note_edit_update']`).each(function() {
+        let notes = new Object();
+        let idElemt = jq2(this).attr('id');
+        let id = idElemt.substr(-1);
+        let  name_note =jq2(`#name_note_edit_${id}`).val(); 
+        if(name_note  == ""){
+            jq2(`#${idElemt}`).val("");
+        }else{   
+            let n_note = name_note;
+            let id_note =  jq2(`#id_note_edit_${id}`).val();
+            notes.note_id = id_note;
+            notes.note_name = n_note;
+            arrayNotes.push(notes);
+        }
+
+    });
+      updateEditorial.summary = summary;
+      updateEditorial.notes = arrayNotes;
+
+      jq2.ajax({
+          url :  opc_vars.ajaxurl,
+          type : "POST",
+          data :{
+            action : 'save_update_edit',
+            datos : updateEditorial
+          },
+          success : function(res){
+                    //console.log(res);
+                    location.reload();
+          }
+      })
+
+     
+  });
+
+  jq2(document).on("focus",  "input[name='note_edit_update']" ,function(e){
+    let item = jq2(this).attr('id');
+    let k = item.substr(-1);
+    console.log(k)
+    get_post_for_editorial(k);
+       // return false;
+    
+    });
+
+    function get_post_for_editorial(elem){
+        let item = `res_note_edit_${elem}`;
+        jq2(`#${item}`).html("");
+        tema_id=0;
+    
+
+        jq2.ajax({
+            url: opc_vars.ajaxurl,
+            type: "POST",
+            data: {
+                action : 'get_posts',
+                search : tema_id
+            },
+            beforeSend: function(){
+                jq2(`#${item}`).html('<div class="imgload">Buscando resultados ...</div>');
+            },    
+            success : function( result ) {
+                // console.log(result);
+                  let obj = JSON.parse(result);
+                 // console.log(obj);
+                   let size = obj.length;
+                   let idSelectable = `select_editorial_${elem}`;
+       
+                   let opc = `<ol class="selector" id="${idSelectable}">` 
+                   for(let i =0 ;  i<size ; i++){
+                       let id =  obj[i]["id"];
+                       let title=  obj[i]["post_title"];
+                       opc+= `<li id="${id}">${title}</li>`
+                   }
+                   opc+= `</ol>` ;
+                   
+                   jq2(`#${item}`).html(opc);
+                   
+                   jq2(`#${idSelectable}`).selectable({
+                       selected: function(event, ui) {
+                          let selected_id = jq2(ui.selected).attr('id');
+                          let selected_name = jq2(ui.selected).text();
+                          jq2(`#name_note_edit_${elem}`).val(selected_name);
+                          jq2(`#id_note_edit_${elem}`).val(selected_id);
+                          jq2(`#${item}`).html("");
+                       }
+                   });
+               } ,
+            fail : function( jqXHR, textStatus, errorThrown ) {
+                console.log( "La solicitud de nota principal ha fallado: " +  textStatus +" - "  +errorThrown);
+            }
+        })     
+    }
+
+    jq2(document).on("focusout",  "input[name='note_edit_update']" ,function(e){
+        let item = jq2(this).attr('id');
+        let elem = item.substr(-1);
+        
+        let res_notas = `res_note_edit_${elem}`;
+        jq2(`#${res_notas}`).html("");
+    });
+
+
+
+ /**** TAB-1  */
+get_themes_home();
+/*****TAB-2 */
+//
+
+
+let tabss = jq2( "#ophome-tabs" ).tabs({
+    active: 0,
+  });
+  
+
+  jq2( "#link_tab_2" ).on( "click", function() {
+    get_feed_trasmision_vivo();
+  
+  });
+
+  jq2("#link_tab_3").on("click" , function(){
+      get_feed_update_edit();
+  });
+
+
 
 });
 
