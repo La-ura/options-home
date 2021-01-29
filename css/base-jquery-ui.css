@@ -901,7 +901,7 @@ body .ui-tooltip {
 }
 .ui-widget-content {
 	border: 1px solid #dddddd;
-	/* background: #F9F9FB; */
+	 background: #f6f6f6; 
 	color: #333333;
 }
 .ui-widget-content a {
@@ -929,7 +929,7 @@ works properly when clicked or hovered */
 html .ui-button.ui-state-disabled:hover,
 html .ui-button.ui-state-disabled:active {
 	border: 1px solid #c5c5c5;
-	background: #f6f6f6;
+/*	background: #f6f6f6;*/
 	font-weight: normal;
 	color: #454545;
 }
@@ -979,12 +979,13 @@ a.ui-button:focus {
 a.ui-button:active,
 .ui-button:active,
 .ui-button.ui-state-active:hover {
-	border: 1px solid #007cba;
-/*	background: #007fff; */
-	background: #007cba; 
-
+	/*border: 1px solid #007cba;
+	background: #007fff; */
+	background: #f6f6f6; 
+	border: 1px solid #ddd;
+	border-bottom-color :#fdfdfd;
 	font-weight: normal;
-	color: #ffffff;
+	color: #007fff;
 }
 .ui-icon-background,
 .ui-state-active .ui-icon-background {
@@ -994,7 +995,8 @@ a.ui-button:active,
 .ui-state-active a,
 .ui-state-active a:link,
 .ui-state-active a:visited {
-	color: #ffffff;
+/*	color: #ffffff;*/
+color : #0071a1;
 	text-decoration: none;
 }
 
