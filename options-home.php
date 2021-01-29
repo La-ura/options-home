@@ -126,6 +126,8 @@ add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
 		 if( $title_plugin  !="Opciones del home") 
 		 return false ;
 		 else {
+		
+		wp_enqueue_media();
 		wp_register_script('opc_home', plugin_dir_url( __FILE__ ) . 'js/script.js', 
 							array('jquery' , 
 									'jquery-effects-core', 
