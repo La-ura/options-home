@@ -709,8 +709,8 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
         })
     });
 
+/***** Obtiene los datos de transmison en vivo  */
     function get_feed_trasmision_vivo(){
-       
         jq2.ajax({
             url: opc_vars.ajaxurl,
             type : "POST",
@@ -725,16 +725,14 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
                     jq2("#title_trans_vivo").val(obj["title"]);
                     jq2("#image-url").val(obj["image"]);
                     jq2("#active_transmision").prop('checked', JSON.parse(obj["active"]));
-                    
                    // console.log( );
 
                 }
             }
         })
     }
-
+/*** Obtiene datos de seleccion del editor */
     function get_feed_update_edit(){
-        
         jq2.ajax({
             url: opc_vars.ajaxurl,
             type : "POST",
@@ -742,13 +740,11 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
                 action : 'get_update_edit'
             },
             success : function(res){
-                
                 if(res != ""){
                     let obj = JSON.parse(res);
                     jq2("#summary_edit").val(obj["summary"]);
-                 
+                    jq2("#active_edit_update").prop('checked', JSON.parse(obj["active"]));
                         if(obj.notes  !== undefined){
-                          
                          let nota = obj.notes;
                           let tl =   Object.keys(nota).length;
                            for (let i = 0; i< tl; i++){
@@ -758,21 +754,18 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
                             jq2(`#id_note_edit_${i}`).val(id);
 
                            }
-                       
                         }
-                   
                  }
             }
         })
     }
 
-
-
-
+/*********  Guarda Selección del editor **********************/
   jq2("#save_update_edit").click(function (){
      
     let updateEditorial = new Object();
     let summary = jq2("#summary_edit").val();
+    let active_update_editorial = jq2('#active_edit_update').is(':checked');
     let arrayNotes = [];
    
     jq2(`input[name='note_edit_update']`).each(function() {
@@ -793,7 +786,7 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
     });
       updateEditorial.summary = summary;
       updateEditorial.notes = arrayNotes;
-
+      updateEditorial.active = active_update_editorial;
       jq2.ajax({
           url :  opc_vars.ajaxurl,
           type : "POST",

@@ -26,6 +26,7 @@ add_action('wp_ajax_change_order','chenge_order_themes');
 add_action('wp_ajax_save_trans_vivo','save_transmision_vivo');
 /* Obtiene transmision en vivo */
 add_action('wp_ajax_get_trans_vivo','get_transmision_vivo');
+/* Obtiene el feed main_theme_home */
 add_action('wp_ajax_save_main_theme_home','save_main_theme');
 add_action('wp_ajax_save_update_edit','save_edit');
 add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
@@ -70,7 +71,7 @@ add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
 			<input id="upload-button" type="button" class="button" value="Upload Image" />
 	</div>
 	<div class = "opch_txt_block">
-	<div class = "opch_txt_left"> Activar : </div>	<input type="checkbox" id ="active_transmision">  &nbsp;
+	<div class = "opch_txt_left"> Activar  </div>	<input type="checkbox" id ="active_transmision">  &nbsp;
 	</div>
 		 
 	<div class ="opch_save"> 
@@ -112,10 +113,15 @@ add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
             </div>
             <div class="resultado_temas_cont" id="res_note_edit_2"></div>
 	</div>
+
+	<div class = "opch_txt_block">
+	<div class = "opch_txt_left"> Activar  </div>	<input type="checkbox" id ="active_edit_update">  &nbsp;
+	</div>
 		 
 	<div class ="opch_save"> 
 		  <input class ="button button-primary button-large" id ="save_update_edit" type="button" value="Guardar" />
 	</div>
+
   </div>
 </div>
 		<?php
@@ -215,7 +221,7 @@ add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
 		}
 		else if($fil_total  == 0){
 			$qry ="SELECT  ID, post_title , post_name FROM  wp_posts  
-			WHERE post_status ='publish' AND post_type = 'post' ORDER BY post_modified DESC  LIMIT 0, 70 ;";
+			WHERE post_status ='publish' AND  post_type IN ('breaking' , 'noticia' , 'video' , 'especiales') ORDER BY post_modified DESC  LIMIT 0, 70 ;";
 		}
 			
 			$posts = $wpdb->get_results( $qry );
