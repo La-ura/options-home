@@ -189,15 +189,14 @@ add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
 		
 		$filter =[];
 		
-		if( isset ($_POST["search"]) && $_POST["search"] != 0) 
+		if(isset ($_POST["search"]) && $_POST["search"] != '0') 
 				array_push($filter,  " term_id = ".$_POST["search"]);
-		if(isset ($_POST["title"]) && $_POST["title"] != 0)
+		if(isset ($_POST["title"]) && $_POST["title"] != '0'){
 				array_push($filter,  " post_title LIKE '%".$_POST["title"]."%'");
-			
 				
+			}
 		$fil_total = count($filter);
-		
-		
+		//var_dump( $_POST["title"] );
 		if($fil_total  == 2) {
 			$qry_where  = " WHERE ".$filter[0]. " AND ".$filter[1]. " AND post_status ='publish' ";
 
@@ -217,13 +216,14 @@ add_action('wp_ajax_get_update_edit','get_feed_editorial_update');
 				INNER JOIN wp_term_taxonomy USING(term_id)
 				INNER JOIN wp_term_relationships tr USING (term_taxonomy_id)
 				INNER JOIN wp_posts p ON tr.object_id =p.ID 
-				 ".$qry_where ." ORDER BY post_modified DESC  LIMIT 0, 50 ";
+				 ".$qry_where ." Group by ID ORDER BY post_modified DESC  LIMIT 0, 50 ";
+				
 		}
 		else if($fil_total  == 0){
 			$qry ="SELECT  ID, post_title , post_name FROM  wp_posts  
 			WHERE post_status ='publish' AND  post_type IN ('breaking' , 'noticia' , 'video' , 'especiales') ORDER BY post_modified DESC  LIMIT 0, 70 ;";
 		}
-			
+		
 			$posts = $wpdb->get_results( $qry );
 	
 		$n=0;

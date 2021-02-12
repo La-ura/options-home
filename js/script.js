@@ -8,12 +8,12 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
         <div class ="opch_txt_block">
         <input type ="hidden" name ="option_names" id = "option_name_${n}">
             <div class = "opch_txt_left"> <strong> Tema ${n} : </strong> </div> 
-            <div><input type ="text"  size = "70" name="theme_name" id="theme_name_${n}" placeholder="Escribe el nombre del tema"></div>
+            <div><input type ="text"  size = "70" name="theme_name" id="theme_name_${n}" placeholder="Escribe el nombre del tema" autocomplete="off" ></div>
         </div>
         <div class ="opch_txt_block">
             <div class ="opch_txt_left">Selecciona un tema: </div>
             <div>
-                <input type = "text" name = "tema" size = "70" id = "tema_${n}" placeholder="Buscar tema ">
+                <input type = "text" name = "tema" size = "70" id = "tema_${n}" placeholder="Buscar tema " autocomplete="off" >
                 <input type ="hidden" name ="tema_id" id = "tema_id_${n}">
             </div>
             <div class="resultado_temas_cont" id="resultado_temas_${n}"></div>
@@ -22,7 +22,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
         <div class ="opch_txt_block">
             <div class = "opch_txt_left">Nota principal : </div>
             <div>
-                <input type = "text" name = "name_main_note" size = "70" id = "nmn_${n}" placeholder="Buscar nota principal">
+                <input type = "text" name = "name_main_note" size = "70" id = "nmn_${n}" placeholder="Buscar nota principal" autocomplete="off" >
                 <input type ="hidden" name ="id_main_note" id = "imn_${n}">
             </div>
             <div class="resultado_temas_cont" id="res_nmn_${n}"></div>
@@ -40,7 +40,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
             <div class = "opch_txt_left"> Nota 1 : </div>
             <div class = "opch_check_active"><input type ="checkbox" name ="activo_${n}" id = "ckact_1_${n}"></div>
              <div  class="opch_ohter_notes">
-                <input type ="text" name = "name_notes" size = "65" id = "nn_1_${n}" placeholder="Buscar nota # 1">
+                <input type ="text" name = "name_notes" size = "65" id = "nn_1_${n}" placeholder="Buscar nota # 1" autocomplete="off" >
                 <input type ="hidden" name ="id_notes_${n}" id = "in_1_${n}">
             </div>
             <div class="resultado_temas_cont_2" id="res_nn_1_${n}"></div>
@@ -53,7 +53,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
             <div class = "opch_txt_left">Nota 2 : </div>
             <div class = "opch_check_active">	<input type ="checkbox" name ="activo_${n}" id = "ckact_2_${n}"></div>
                 <div class="opch_ohter_notes">	
-                    <input type ="text" name = "name_notes" size = "65" id = "nn_2_${n}" placeholder="Buscar nota # 2">
+                    <input type ="text" name = "name_notes" size = "65" id = "nn_2_${n}" placeholder="Buscar nota # 2" autocomplete="off" >
                     <input type ="hidden" name ="id_notes_${n}" id = "in_2_${n}">
                 </div>
                 <div class="resultado_temas_cont_2" id="res_nn_2_${n}"></div>
@@ -66,7 +66,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
             <div class = "opch_txt_left">Nota 3 : </div>
             <div class = "opch_check_active"><input type ="checkbox" name ="activo_${n}" id = "ckact_3_${n}"></div>
                 <div  class="opch_ohter_notes">	
-                    <input type ="text" name = "name_notes" size = "65" id = "nn_3_${n}" placeholder="Buscar nota # 3">
+                    <input type ="text" name = "name_notes" size = "65" id = "nn_3_${n}" placeholder="Buscar nota # 3" autocomplete="off" >
                     <input type ="hidden" name ="id_notes_${n}" id = "in_3_${n}">
                 </div>
                 <div class="resultado_temas_cont_2" id="res_nn_3_${n}"></div>
@@ -208,6 +208,8 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                 jq2("#res_nmn_"+m).html('<div class="imgload">Buscando resultados ...</div>');
             },           
             success : function( result ) {   
+                //console.log(result);
+                
                     let obj = JSON.parse(result);
                     let size = obj.length;
                     let idSelectable = "selectable_mn"+m;   
@@ -229,7 +231,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                            jq2("#res_nmn_"+m).html("");
                         }
                     });
-                 
+                
                 },
                 fail: function( jqXHR, textStatus, errorThrown ) {
                     console.log( "La solicitud de nota principal ha fallado: " +  textStatus +" - "  +errorThrown);
@@ -241,25 +243,33 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
    jq2(document).on("keyup",  "input[name='name_main_note']" ,function(e){
     let item = jq2(this).attr('id');
     let k = item.substr(4);
-    let minlength =15;
+    let code = (e.keyCode ? e.keyCode : e.which); // Si hay un enter , busca el string
     let that = this, value = jq2(this).val();
-    if(value.length >= minlength ) {
-        get_posts(k);
-        return false;
-    }
-     });
- 
-   
-    jq2(document).on("focus",  "input[name='name_main_note']" ,function(e){
-        let item = jq2(this).attr('id');
-        let k = item.substr(4);
-        let minlength =3;
-        let that = this, value = jq2(this).val();
-      
+    if(value.length > 0 ) {
+        jq2("#res_nmn_"+k).html("");
+        if( code == 13) {
             get_posts(k);
             return false;
-        
+          }
+    }else if(value.length ==0){
+        //console.log("busca otra vez");
+        get_posts(k);
+    } 
+});
+ 
+   // Cuando estas en text de nota principal mustra las ultimas 50 notas
+    jq2(document).on("focus",  "input[name='name_main_note']" ,function(e){
+        let item = jq2(this).attr('id');
+        let k = item.substr(4);    
+        let that = this, value = jq2(this).val();
+        if(value.length > 0 ) {
+            console.log("No busques nada");
+        }else {
+            get_posts(k);
+            return false;
+        }
     });
+    // Borra resultados si sale del text de la nota principal
     jq2(document).on("focusout",  "input[name='name_main_note']" ,function(e){
         let item = jq2(this).attr('id');
         let k = item.substr(4);
@@ -275,25 +285,35 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
    jq2(document).on("keyup",  "input[name='name_notes']" ,function(e){
     let item = jq2(this).attr('id');
    // console.log("este es el id" +  item);
-    let tema = item.substr(5);
-    let elem = item.substr(3 , 1) ;
-    let minlength =15;
-    let that = this, value = jq2(this).val();
-    if(value.length >= minlength ) {
+   let tema = item.substr(5);
+   let elem = item.substr(3 , 1) ;
+   let that = this, value = jq2(this).val();
+   let code = (e.keyCode ? e.keyCode : e.which); // Si hay un enter , busca el string
+    if(value.length > 0 ) {
+        jq2(`#res_nn_${elem}_${tema}`).html("");
+        if( code == 13) {
+            get_notes(tema, elem);   
+            return false;
+        }
+    }else if(value.length ==0){
         get_notes(tema, elem);
-        return false;
+        
     }
      });
 
     jq2(document).on("focus",  "input[name='name_notes']" ,function(e){
+        console.log("on focus ...");
         let item = jq2(this).attr('id');
-       // console.log("este es el id" +  item);
         let tema = item.substr(5);
         let elem = item.substr(3 , 1) ;
-        let that = this, value = jq2(this).val();
+      
+      let that = this, value = jq2(this).val();
+        if(value.length > 0 ) {
+            console.log("No busques nada");
+        }else {
             get_notes(tema, elem);
             return false;
-        
+        }
     });
     
     jq2(document).on("focusout",  "input[name='name_notes']" ,function(e){
@@ -304,22 +324,22 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
         jq2(`#${res_notas}`).html("");
     });
 
-
-   
        /* OBTIENE LAS NOTAS secundarias*/
     function get_notes(tema, elem){
         let res_notas = `res_nn_${elem}_${tema}`;
         jq2(`#${res_notas}`).html("");
         let tema_id = jq2("#tema_id_"+tema).val();
         if(tema_id == "") tema_id=0;
-    
-
+     
+        let search_title = jq2(`#nn_${elem}_${tema}`).val();
+        if(search_title =="") search_title=0;
         jq2.ajax({
             url: opc_vars.ajaxurl,
             type: "POST",
             data: {
                 action : 'get_posts',
-                search : tema_id
+                search : tema_id,
+                title : search_title
             },
             beforeSend: function(){
                 jq2(`#${res_notas}`).html('<div class="imgload">Buscando resultados ...</div>');
@@ -363,7 +383,6 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
         save_themes(tema);  
     });
 
-        
     function save_themes(t){
         let temahome = jq2(`#option_name_${t}`).val();
        // let temahome = `home_theme_${t}`;
@@ -380,8 +399,6 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
         myTheme.taxonomy_name = tema_name;
         myTheme.main_note_id =  idmn;
         myTheme.main_note_name =  nmn;
-
-        
         let arrayNotes = [];
         
         jq2(`input[name='id_notes_${t}']`).each(function() {
@@ -406,7 +423,6 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                 
                 arrayNotes.push(notes);
             }
-            
         });
         console.log(`Saved theme : ${temahome}`);
         console.log(myTheme);
@@ -429,24 +445,19 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
              });
     }
 
-    
     async function get_themes_home(){
         jq2("div#tabs-1").html("<h1>Temas del Home</h1>");
-
-       await  jq2.ajax({
+        await  jq2.ajax({
             url: opc_vars.ajaxurl,
             type: "POST",
             data: {
                 action : 'get_themes'
             } ,
             success : function( result ) {
-          
                 //  console.log( `: ${obj}`); 
-      
               if(result != "" ) {    
                   let obj = JSON.parse(result);
                   let size = obj.length;
-                 // console.log(size);
               if(size > 0) {
                   for(let i = 0; i< size ; i++){
                       let k = i+1;
@@ -470,7 +481,6 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                       jq2(`#tema_${k}`).val(taxonomyname);
                       jq2(`#option_name_${k}`).val(option_name);
                       jq2(`#order_${k}`).val(order);
-      
                       //console.log( `${name} : main_note ${mainnoteid} : taxonomyid  ${taxonomyid} :  taxonomyname ${taxonomyname}`);
                       if( arry_notes !== undefined){
                           let tn = arry_notes.length;
@@ -493,8 +503,7 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
                       }
                      // console.log(` ........... ${k} ........  `);
                   } 
-              }
-        
+                }
               }else{
                   console.log("No hay themas guardados");
                   let fmdefault = form_default();
@@ -505,8 +514,6 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
               fail : function( jqXHR, textStatus, errorThrown ) {
                    console.log( "La solicitud de obtener get_themes_home ha fallado: " +  textStatus +" - "  +errorThrown);
                }
-                         
-            
         });
         await btn_generales_tab1();
      
@@ -515,13 +522,11 @@ let fm = `<div class ="opch_wrap" id="theme_content_${n}">
 jq2(document).on("click","input[name=btn_delete_themes]",function(e){
     let theme = jq2(this).attr('id');
     theme = theme.substr(-1);
-
     delete_theme = jq2(`#option_name_${theme}`).val();
     console.log(`delete theme : ${delete_theme}`);
     let conf = confirm(`¿Está seguro de eliminar el tema  ${theme}?`);
     if(conf){
             console.log("Eliminando.....");
-
             jq2.ajax({
                 url: opc_vars.ajaxurl,
                 type: "POST",
@@ -534,7 +539,6 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
                 jq2(`#theme_content_${theme}`).empty();
                 updateMainTheme();
                 location.reload();
-               
             })
             .fail(function( jqXHR, textStatus, errorThrown ) {
                  console.log( "La solicitud de eliminar tema ha fallado: " +  textStatus +" - "  +errorThrown);
@@ -542,16 +546,12 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
     }
 });
 
-
     jq2(document).on("focusout","input[name=order_themes]",function(e){
         let theme = jq2(this).attr('id');
         theme = theme.substr(-1);
         let valor = parseInt(jq2(this).val());
-
-        
         if(valor> 0 && valor <  n) {
-            console.log(theme +" "+valor);
-            
+            console.log(theme +" "+valor);  
         }else{
             alert("Solo se permiten valores del 1 al " +(n-1));
             jq2(this).val(theme);
@@ -565,7 +565,6 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
         let valores = [];
         let duplicados = [];
         let arrayTheme = [];
-
         jq2("input[name='order_themes']").each(function( ind, elem) {
             let theme = new Object();
             let item = jq2(elem).val();
@@ -578,9 +577,7 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
             valores.push(item);
                         
         });
-
         const tempArray = [...valores].sort();
-
         for (let i = 0; i < tempArray.length; i++) {
             if (tempArray[i + 1] === tempArray[i]) {
               duplicados.push(tempArray[i]);
@@ -600,13 +597,11 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
                 .success(function( result ) {
                   location.reload();
                  // console.log(result);
-                
                 })
                 .fail(function( jqXHR, textStatus, errorThrown ) {
                     console.log( "La solicitud de eliminar tema ha fallado: " +  textStatus +" - "  +errorThrown);
                 });
           }
-        
     });
 
     function updateMainTheme(){
@@ -614,7 +609,6 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
         let i=1;
         jq2("input[name='order_themes']").each(function( ind, elem) {
             let theme = new Object();
-
             let item = jq2(elem).val();
             let id = jq2(elem).attr('id');
                 id = id.substr(-1);
@@ -636,43 +630,33 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
             }            
         })
         .success(function( result ) {
-         // location.reload();
-          console.log(result);
-        
+         console.log(result);
         })
         .fail(function( jqXHR, textStatus, errorThrown ) {
             console.log( "La solicitud de eliminar tema ha fallado: " +  textStatus +" - "  +errorThrown);
         });
-
     }
 
     function btn_generales_tab1(){
-        
         let btn_gral  =` <div  class="bt_save_them" id ="bt_save_them_1"> <input type ="button" class ="button tagadd" value="Añadir tema" id="add_theme"></div>
                 <div class="bt_orden_them" id ="bt_orden_them_1">	<input type ="button" class ="button tagadd" value="Guardar orden de los temas" id="change_order_theme"></div>`;     
-             jq2("div#tabs-1").append(btn_gral);
-           //  console.log(" .. botones generales ..");
-
+             jq2("div#tabs-1").append(btn_gral);     
     }
  
     let mediaUploader;
     jq2('#upload-button').click(function(e) {
-       
 		e.preventDefault();
-
 	  // If the uploader object has already been created, reopen the dialog
 		if (mediaUploader) {
 			mediaUploader.open();
 			return;
 		}
-
 	  // Extend the wp.media object
 	  mediaUploader = wp.media.frames.file_frame = wp.media({
 				title: 'Selecciona una imagen',
 				button: {
 				text: 'Selecciona una imagen'
 			}, multiple: false });
-
 	  // When a file is selected, grab the URL and set it as the text field's value
 	  mediaUploader.on('select', function() {
 			attachment = mediaUploader.state().get('selection').first().toJSON();
@@ -767,7 +751,6 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
     let summary = jq2("#summary_edit").val();
     let active_update_editorial = jq2('#active_edit_update').is(':checked');
     let arrayNotes = [];
-   
     jq2(`input[name='note_edit_update']`).each(function() {
         let notes = new Object();
         let idElemt = jq2(this).attr('id');
@@ -799,31 +782,24 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
                     location.reload();
           }
       })
-
-     
   });
 
-  jq2(document).on("focus",  "input[name='note_edit_update']" ,function(e){
-    let item = jq2(this).attr('id');
-    let k = item.substr(-1);
-    console.log(k)
-    get_post_for_editorial(k);
-       // return false;
-    
-    });
+
 
     function get_post_for_editorial(elem){
         let item = `res_note_edit_${elem}`;
         jq2(`#${item}`).html("");
-        tema_id=0;
-    
+       let tema_id=0;
+       let search_title = jq2("#name_note_edit_"+elem).val();
+       if(search_title =="") search_title="0";
 
         jq2.ajax({
             url: opc_vars.ajaxurl,
             type: "POST",
             data: {
                 action : 'get_posts',
-                search : tema_id
+                search : tema_id,
+                title  : search_title
             },
             beforeSend: function(){
                 jq2(`#${item}`).html('<div class="imgload">Buscando resultados ...</div>');
@@ -861,37 +837,60 @@ jq2(document).on("click","input[name=btn_delete_themes]",function(e){
         })     
     }
 
+    jq2(document).on("keyup",  "input[name='note_edit_update']" ,function(e){
+        
+        let item = jq2(this).attr('id');
+        let k = item.substr(-1);
+        let code = (e.keyCode ? e.keyCode : e.which); // Si hay un enter , busca el string
+        let that = this, value = jq2(this).val();
+        if(value.length > 0 ) {
+            jq2(`#res_note_edit_${k}`).html("");
+            if( code == 13) {
+                console.log("KEYUP");
+                get_post_for_editorial(k);
+                return false;
+              }
+        }else if(value.length ==0){
+            get_post_for_editorial(k);
+        } 
+    });
+
+    jq2(document).on("focus",  "input[name='note_edit_update']" ,function(e){
+        let item = jq2(this).attr('id');
+        let k = item.substr(-1);
+        console.log(k)
+        let that = this, value = jq2(this).val();
+        if(value.length > 0 ) {
+            console.log("No busques nada");
+        }else {
+             get_post_for_editorial(k);
+        }
+          
+        });
+
     jq2(document).on("focusout",  "input[name='note_edit_update']" ,function(e){
         let item = jq2(this).attr('id');
         let elem = item.substr(-1);
-        
         let res_notas = `res_note_edit_${elem}`;
         jq2(`#${res_notas}`).html("");
     });
-
-
 
  /**** TAB-1  */
 get_themes_home();
 /*****TAB-2 */
 //
 
-
 let tabss = jq2( "#ophome-tabs" ).tabs({
     active: 0,
   });
   
-
   jq2( "#link_tab_2" ).on( "click", function() {
     get_feed_trasmision_vivo();
-  
   });
 
   jq2("#link_tab_3").on("click" , function(){
       get_feed_update_edit();
   });
-
-
 
 });
 
